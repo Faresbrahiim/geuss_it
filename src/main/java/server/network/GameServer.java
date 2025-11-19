@@ -52,6 +52,9 @@ public class GameServer {
             client.sendMessage(message);
         }
     }
+public List<PlayerHandler> getClients() {
+    return clients;
+}
 
     // Remove a client (on disconnect)
     public void removeClient(PlayerHandler client) {

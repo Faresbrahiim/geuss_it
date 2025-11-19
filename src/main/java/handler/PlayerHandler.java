@@ -30,50 +30,73 @@ public class PlayerHandler implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
-        try {
-            // Ask for username
-            out.println("Enter your username:");
-            String username = in.readLine();
-            player = new Player(username);
-            gameState.addPlayer(player);
 
-            server.broadcast(username + " has joined the game!");
+  @Override
+public void run() {
+    try {
+        // Ask for username
+        out.println("Enter your username:");
+        String username = in.readLine();
+        player = new Player(username);
+        gameState.addPlayer(player);
 
-            // Main loop: receive messages from client
-            String message;
-            while ((message = in.readLine()) != null) {
-                // For now, just print the received message
-                System.out.println(player.getUsername() + ": " + message);
+        server.broadcast(username + " has joined the game!");
 
-                // You can later process guesses or drawing data here
-                // Example: if message starts with "GUESS:", check guess
-                if (message.startsWith("GUESS:")) {
-                    String guess = message.substring(6).trim();
-                    if (gameState.checkGuess(guess)) {
-                        server.broadcast(player.getUsername() + " guessed the word correctly!");
-                        gameState.startNextRound();
-                        server.broadcast("New round started! Drawer: " +
-                                gameState.getCurrentRound().getDrawer().getUsername());
+        // If this is the first player, start the first round
+        if (gameState.getCurrentRound() == null) {
+            gameState.startNextRound();
+            server.broadcast("New round started! Drawer: " +
+                    gameState.getCurrentRound().getDrawer().getUsername());
+        }
+
+        // Main loop: receive messages from client
+        String message;
+        while ((message = in.readLine()) != null) {
+            System.out.println(player.getUsername() + ": " + message);
+
+            if (message.startsWith("GUESS:")) {
+                String guess = message.substring(6).trim();
+
+                // Broadcast the guess to everyone (except the drawer)
+                for (PlayerHandler client : server.getClients()) {
+                    if (!client.getPlayer().equals(gameState.getCurrentRound().getDrawer())) {
+                        client.sendMessage(player.getUsername() + " guessed: " + guess);
                     }
                 }
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                socket.close();
-                gameState.getPlayers().remove(player); // remove from game state
-                server.removeClient(this);
-                server.broadcast(player.getUsername() + " disconnected.");
-                System.out.println(player.getUsername() + " disconnected.");
-            } catch (IOException e) {
-                e.printStackTrace();
+                // Check if the guess is correct
+                if (gameState.checkGuess(guess)) {
+                    server.broadcast(player.getUsername() + " guessed the word correctly!");
+                    gameState.startNextRound();
+                    server.broadcast("New round started! Drawer: " +
+                            gameState.getCurrentRound().getDrawer().getUsername());
+                } else {
+                    // Send feedback to the guessing player
+                    sendMessage("Wrong guess: " + guess);
+                }
             }
         }
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            socket.close();
+            gameState.getPlayers().remove(player);
+            server.removeClient(this);
+            server.broadcast(player.getUsername() + " disconnected.");
+            System.out.println(player.getUsername() + " disconnected.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+}
+
+// Getter for player (needed for broadcasting guesses)
+public Player getPlayer() {
+    return player;
+}
+
 
     // Send message to this client
     public void sendMessage(String message) {
