@@ -50,9 +50,10 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>org.fares.Main</mainClass>
+                    <mainClass>app.TestJavaFX</mainClass>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
