@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ui.GameController">
+
+    <!-- Top: Round info and role -->
+    <top>
+        <HBox spacing="20" >
+            <Label text="Round:"/>
+            <Label fx:id="roundLabel" text="1"/>
+            <Label text="Role:"/>
+            <Label fx:id="roleLabel" text="Guesser"/>
+        </HBox>
+    </top>
+
+    <!-- Center: Canvas for drawing -->
+    <center>
+        <StackPane >
+            <Canvas fx:id="drawingCanvas" width="600" height="400" style="-fx-border-color: black;"/>
+        </StackPane>
+    </center>
+
+    <!-- Right: List of guesses -->
+    <right>
+        <VBox spacing="10">
+            <Label text="Guesses:"/>
+            <ListView fx:id="guessListView" prefWidth="200" prefHeight="400"/>
+        </VBox>
+    </right>
+
+    <!-- Bottom: Guess input -->
+    <bottom>
+        <HBox spacing="10" >
+            <TextField fx:id="guessField" promptText="Type your guess..." HBox.hgrow="ALWAYS"/>
+            <Button text="Send" fx:id="sendGuessButton"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

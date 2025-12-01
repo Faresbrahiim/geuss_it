@@ -1,0 +1,5 @@
+(1) Send me your backend code → I check structure
+(2) Add JavaFX project structure (pom.xml + Application class)
+(3) Create FXML screens (login → lobby → game)
+(4) Connect GameClient to UI
+(5) Add drawing canvas + network sync

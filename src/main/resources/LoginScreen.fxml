@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="client.ui.LoginController"
+      alignment="CENTER" spacing="15" prefWidth="300" prefHeight="200">
+
+    <Label text="Enter your username:"/>
+
+    <TextField fx:id="usernameField" promptText="Username" maxWidth="200"/>
+
+    <Button fx:id="connectButton" text="Connect" maxWidth="100"/>
+</VBox>
