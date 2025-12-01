@@ -2,14 +2,49 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<VBox xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="client.ui.LoginController"
-      alignment="CENTER" spacing="15" prefWidth="300" prefHeight="200">
+<StackPane xmlns="http://javafx.com/javafx/20"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="client.ui.LoginController"
+           style="-fx-background-color: linear-gradient(to bottom,#4A90E2,#145A9E);">
 
-    <Label text="Enter your username:"/>
+    <VBox alignment="CENTER" spacing="30">
+        
+        <!-- Bigger Login Card -->
+        <VBox spacing="30" alignment="CENTER"
+              style="-fx-background-color: white; 
+                     -fx-border-radius: 20; 
+                     -fx-background-radius: 20; 
+                     -fx-padding: 50;
+                     -fx-border-color: #333;
+                     -fx-border-width: 3;
+                     -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.3),20,0,0,5);"
+              prefWidth="450" prefHeight="400">
 
-    <TextField fx:id="usernameField" promptText="Username" maxWidth="200"/>
+            <Label text="🎨 GUESS IT!"
+                   style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #333;" />
 
-    <Button fx:id="connectButton" text="Connect" maxWidth="100"/>
-</VBox>
+            <Label text="Enter your username"
+                   style="-fx-font-size: 18px; -fx-text-fill: #666;" />
+
+            <TextField fx:id="usernameField"
+                       promptText="Username"
+                       maxWidth="320"
+                       style="-fx-background-radius: 12; 
+                              -fx-border-radius: 12; 
+                              -fx-font-size: 18px;" />
+
+            <Button fx:id="connectButton"
+                    text="Connect"
+                    maxWidth="200"
+                    style="-fx-background-color: #4A90E2; 
+                           -fx-text-fill: white; 
+                           -fx-font-size: 18px; 
+                           -fx-font-weight: bold;
+                           -fx-background-radius: 12;
+                           -fx-padding: 12 30;" />
+        </VBox>
+    </VBox>
+
+</StackPane>
