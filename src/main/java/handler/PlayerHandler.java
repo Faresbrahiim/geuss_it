@@ -37,10 +37,8 @@ public class PlayerHandler implements Runnable {
     @Override
     public void run() {
         try {
-            // ✅ Read username (sent by client)
             String username = in.readLine();
             if (username == null || username.trim().isEmpty()) {
-                System.out.println("Invalid username, closing connection");
                 return;
             }
             
@@ -55,42 +53,31 @@ public class PlayerHandler implements Runnable {
             if (gameState.getCurrentRound() == null) {
                 gameState.startNextRound();
                 Round currentRound = gameState.getCurrentRound();
-                
-                // Send human-readable message
-                server.broadcast("New round started! Drawer: " + currentRound.getDrawer().getUsername());
-                
-                // ✅ Send structured message for client parsing
-                String roundMsg = "ROUND_STARTED:" + currentRound.getRoundNumber() + "," + currentRound.getDrawer().getUsername();
-                server.broadcast(roundMsg);
-                System.out.println("✅ Broadcasted: " + roundMsg);
-                
-                gameState.notifyRoundStarted(currentRound);
+                broadcastRoundStart(currentRound);
             } else {
-                // ✅ Send current round info to newly connected player
+                // Send current round info to new player
                 Round currentRound = gameState.getCurrentRound();
-                String roundMsg = "ROUND_STARTED:" + currentRound.getRoundNumber() + "," + currentRound.getDrawer().getUsername();
-                sendMessage(roundMsg);
-                System.out.println("✅ Sent current round to " + username + ": " + roundMsg);
+                sendRoundInfo(currentRound);
                 
-                // Send existing drawing data
+                // Send existing drawing
                 for (String stroke : currentRound.getDrawingData()) {
                     sendMessage("STROKE:" + stroke);
                 }
             }
 
+            // Send initial score
+            sendMessage("SCORE_UPDATE:" + player.getScore());
+
             String message;
             while ((message = in.readLine()) != null) {
                 System.out.println("Received from " + username + ": " + message);
 
-                // Handle GUESS
                 if (message.startsWith("GUESS:")) {
-                    String guess = message.substring(6).trim();
-                    handleGuess(guess);
-                } 
-                // Handle STROKE
-                else if (message.startsWith("STROKE:")) {
-                    String strokeData = message.substring(7).trim();
-                    handleStroke(strokeData);
+                    handleGuess(message.substring(6).trim());
+                } else if (message.startsWith("STROKE:")) {
+                    handleStroke(message.substring(7).trim());
+                } else if (message.equals("READY")) {
+                    // Player ready for new game (optional)
                 }
             }
 
@@ -103,65 +90,95 @@ public class PlayerHandler implements Runnable {
 
     private void handleGuess(String guess) {
         Round currentRound = gameState.getCurrentRound();
-        if (currentRound == null) {
-            return;
-        }
+        if (currentRound == null) return;
 
-        // Don't allow drawer to guess
         if (player.equals(currentRound.getDrawer())) {
-            sendMessage("You are the drawer! You cannot guess.");
+            sendMessage("❌ You are the drawer! You cannot guess.");
             return;
         }
 
-        // Broadcast the guess to everyone
-        server.broadcast(player.getUsername() + " guessed: " + guess);
+        server.broadcast("💭 " + player.getUsername() + " guessed: " + guess);
 
         boolean correct = gameState.checkGuess(guess);
         if (correct) {
-            player.addScore(10);
-            server.broadcast(player.getUsername() + " guessed the word correctly! ✅");
+            // Award points: guesser gets 100, drawer gets 50
+            player.addScore(100);
+            currentRound.getDrawer().addScore(50);
+            
+            server.broadcast("✅ " + player.getUsername() + " guessed correctly! (+100 points)");
+            server.broadcast("✏️ " + currentRound.getDrawer().getUsername() + " gets +50 points!");
+
+            // Send score updates
+            sendMessage("SCORE_UPDATE:" + player.getScore());
+            server.sendScoreUpdate(currentRound.getDrawer());
+
+            // Check if game is over (5 rounds completed)
+            if (gameState.getRoundNumber() > 5) {
+                endGame();
+                return;
+            }
 
             // Start new round
             gameState.startNextRound();
             Round newRound = gameState.getCurrentRound();
-            
-            server.broadcast("New round started! Drawer: " + newRound.getDrawer().getUsername());
-            String roundMsg = "ROUND_STARTED:" + newRound.getRoundNumber() + "," + newRound.getDrawer().getUsername();
-            server.broadcast(roundMsg);
-            System.out.println("✅ New round broadcasted: " + roundMsg);
-
-            gameState.notifyRoundStarted(newRound);
+            broadcastRoundStart(newRound);
         } else {
-            sendMessage("Wrong guess: " + guess);
+            sendMessage("❌ Wrong guess!");
         }
-
-        gameState.notifyGuessResult(player, correct);
     }
 
     private void handleStroke(String strokeData) {
         Round currentRound = gameState.getCurrentRound();
-        if (currentRound == null) {
-            return;
-        }
+        if (currentRound == null) return;
 
-        // ✅ Verify this player is the drawer
         if (!player.equals(currentRound.getDrawer())) {
-            System.out.println("❌ " + player.getUsername() + " tried to draw but is not the drawer!");
-            sendMessage("You are not the drawer!");
             return;
         }
 
-        System.out.println("✅ Drawer " + player.getUsername() + " sent stroke: " + strokeData);
         currentRound.addDrawingStroke(strokeData);
 
-        // ✅ Broadcast to everyone EXCEPT the drawer
+        // Broadcast to everyone except drawer
         for (PlayerHandler client : server.getClients()) {
             if (!client.equals(this)) {
                 client.sendMessage("STROKE:" + strokeData);
             }
         }
+    }
 
-        gameState.notifyDrawingUpdated(currentRound);
+    private void broadcastRoundStart(Round round) {
+        // Human-readable message
+        server.broadcast("🎮 Round " + round.getRoundNumber() + " started!");
+        server.broadcast("✏️ Drawer: " + round.getDrawer().getUsername());
+        
+        // Structured messages for each client
+        for (PlayerHandler client : server.getClients()) {
+            client.sendRoundInfo(round);
+        }
+    }
+
+    private void sendRoundInfo(Round round) {
+        // Send word only if this player is the drawer
+        String word = player.equals(round.getDrawer()) ? round.getWordToGuess() : "";
+        String msg = "ROUND_STARTED:" + round.getRoundNumber() + "," + 
+                     round.getDrawer().getUsername() + "," + word;
+        sendMessage(msg);
+    }
+
+    private void endGame() {
+        // Build leaderboard
+        StringBuilder leaderboard = new StringBuilder("GAME_OVER:");
+        var players = gameState.getPlayersSortedByScore();
+        
+        for (int i = 0; i < players.size(); i++) {
+            Player p = players.get(i);
+            leaderboard.append(p.getUsername()).append(":").append(p.getScore());
+            if (i < players.size() - 1) {
+                leaderboard.append(",");
+            }
+        }
+
+        server.broadcast(leaderboard.toString());
+        System.out.println("🏁 Game Over! Final scores sent.");
     }
 
     private void disconnect() {

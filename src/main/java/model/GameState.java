@@ -2,36 +2,34 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GameState {
 
-    private List<Player> players;        // all players in the game
-    private List<String> wordList;       // list of words to choose from
-    private Round currentRound;          // the current round
-    private int roundNumber;             // current round number
+    private List<Player> players;
+    private List<String> wordList;
+    private Round currentRound;
+    private int roundNumber;
     private Random random;
-
-    // Listener for UI updates
     private GameStateListener listener;
 
-    // Constructor
     public GameState() {
         this.players = new ArrayList<>();
         this.wordList = new ArrayList<>(Arrays.asList(
-                "apple", "car", "house", "tree", "dog", "cat", "sun", "moon"
+                "apple", "car", "house", "tree", "dog", "cat", "sun", "moon",
+                "pizza", "guitar", "phone", "book", "flower", "clock", "plane"
         ));
         this.roundNumber = 1;
         this.random = new Random();
     }
 
-    // --- Listener ---
     public void setListener(GameStateListener listener) {
         this.listener = listener;
     }
 
-    // --- Player management ---
     public void addPlayer(Player player) {
         players.add(player);
     }
@@ -44,7 +42,12 @@ public class GameState {
         return players;
     }
 
-    // --- Round management ---
+    public List<Player> getPlayersSortedByScore() {
+        return players.stream()
+                .sorted(Comparator.comparingInt(Player::getScore).reversed())
+                .collect(Collectors.toList());
+    }
+
     private String chooseRandomWord() {
         return wordList.get(random.nextInt(wordList.size()));
     }
@@ -60,9 +63,8 @@ public class GameState {
         currentRound = new Round(roundNumber, drawer, word);
         roundNumber++;
 
-        System.out.println("New Round Started: " + currentRound);
+        System.out.println("🎮 New Round: " + currentRound);
 
-        // Notify UI or listener
         if (listener != null) {
             listener.onRoundStarted(currentRound);
         }
@@ -72,31 +74,21 @@ public class GameState {
         return currentRound;
     }
 
-    // --- Guessing ---
-    public boolean checkGuess(String guess) {
-        if (currentRound == null) return false;
-        boolean correct = currentRound.getWordToGuess().equalsIgnoreCase(guess.trim());
-        return correct;
+    public int getRoundNumber() {
+        return roundNumber;
     }
 
-    // Call this from PlayerHandler to notify about a guess result
+    public boolean checkGuess(String guess) {
+        if (currentRound == null) return false;
+        return currentRound.getWordToGuess().equalsIgnoreCase(guess.trim());
+    }
+
     public void notifyGuessResult(Player player, boolean correct) {
         if (listener != null) {
             listener.onGuessResult(player, correct);
         }
     }
 
-    // --- Drawing ---
-    public void addDrawingStroke(String stroke) {
-        if (currentRound != null) {
-            currentRound.addDrawingStroke(stroke);
-            if (listener != null) {
-                listener.onDrawingUpdated(currentRound);
-            }
-        }
-    }
-
-    // Notify listeners manually (optional)
     public void notifyRoundStarted(Round round) {
         if (listener != null) {
             listener.onRoundStarted(round);
