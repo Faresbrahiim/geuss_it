@@ -13,6 +13,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+// usernameField → The text input where the user types their username.
+// connectButton → The button the user clicks to connect.
+// client → Instance of GameClient that handles network communication with the server.
 public class LoginController {
 
     @FXML
@@ -23,6 +26,7 @@ public class LoginController {
 
     private GameClient client;
 
+    // set the connect button to connectTOSERVER
     @FXML
     public void initialize() {
         connectButton.setOnAction(e -> connectToServer());
@@ -35,28 +39,30 @@ public class LoginController {
             return;
         }
 
-        // ✅ Set username FIRST before connecting
         client = new GameClient("localhost", 5000, null);
         client.setUsername(username);
         
-        System.out.println("✅ Connecting with username: " + username);
+        System.out.println(" Connecting with username: " + username);
 
         if (!client.connect()) {
             new Alert(AlertType.ERROR, "Failed to connect to server!").showAndWait();
             return;
         }
 
-        // Load game screen FIRST, then send username
         loadGameScreen();
         
-        // ✅ Small delay to ensure GameController is ready
+        //  Small delay to ensure GameController is ready
+        // client.send can block the process
+        // Without a thread: client.send(username) runs on the JavaFX thread → UI can freeze for a short time.
         new Thread(() -> {
             try {
+                //Without delay: Rarely, the game controller might miss the first messages because it’s not fully loaded yet.
                 Thread.sleep(100);
+                // snd username to server
                 client.send(username);
-                System.out.println("✅ Username sent to server: " + username);
+                System.out.println(" Username sent to server: " + username);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                e.printStackTrace(); 
             }
         }).start();
     }

@@ -81,7 +81,7 @@ public class PlayerHandler implements Runnable {
 
             // Send initial score + will be 0 at first
             sendMessage("SCORE_UPDATE:" + player.getScore());
-
+            // we read it from the game contoller  input
             String message;
             while ((message = in.readLine()) != null) {
                 // debuge

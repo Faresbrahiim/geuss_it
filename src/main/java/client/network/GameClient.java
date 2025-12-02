@@ -20,6 +20,7 @@ public class GameClient {
     private PrintWriter out;
     // multiple task at once
     private Thread listenThread;
+    // Callback to handle received messages
     private Consumer<String> messageCallback;
 
     private String username;
@@ -32,59 +33,66 @@ public class GameClient {
     // connect 
     public boolean connect() {
         try {
+            // connect to server
             socket = new Socket(host, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
             startListening();
-            System.out.println("✅ Connected to server!");
+            System.out.println("Connected to server!");
             return true;
         } catch (IOException e) {
-            System.err.println("❌ Failed to connect: " + e.getMessage());
+            System.err.println(" Failed to connect: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
     private void startListening() {
+        // The code inside () -> { ... } is called a lambda 
+        // we use thread because we have many player
+        // put this in the main thread (UI thread), your program will freeze until a message comes.
         listenThread = new Thread(() -> {
             try {
                 String msg;
                 while ((msg = in.readLine()) != null) {
                     if (messageCallback != null) {
-                        messageCallback.accept(msg);
+                        System.out.println(msg + "*******************************************");
+                        messageCallback.accept(msg); // // call the callback will be in gameController
                     }
                 }
             } catch (IOException e) {
                 System.out.println("Disconnected from server.");
             }
         });
-
+        // If the main program finishes, this thread will automatically stop.
         listenThread.setDaemon(true);
+        // start thread
         listenThread.start();
     }
 
+    // send msg to server
     public void send(String message) {
         if (out != null) {
             out.println(message);
-            System.out.println("📤 Sent: " + message);
+            System.out.println(" Sent: " + message);
         }
     }
-
+    // player remove
     public void disconnect() {
         try {
             if (socket != null) socket.close();
-            if (listenThread != null) listenThread.interrupt();
+            if (listenThread != null) listenThread.interrupt();// Stops the listening thread
         } catch (IOException ignored) {}
     }
-
+    // get username
     public String getUsername() {
         return username;
     }
-
+    // set the username
     public void setUsername(String username) {
         this.username = username;
-        System.out.println("✅ Client username set to: '" + username + "'");
+        System.out.println(" Client username set to: '" + username + "'");
     }
 
     public void setMessageCallback(Consumer<String> callback) {

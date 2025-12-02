@@ -14,4 +14,45 @@ gameServer.java class
 playerHandler.java class
     -> handler the  online player 
     -> it brodcast the round informations to player + score + check geuss + brodcast the storke
+gameClient.java class
+    -> conect to server + read msg from server and execute call back from the gameController or LoginController + sends  msg to server + disconnet
+LoginController.java class
+    -> load the login screen + check input + load the game screen
  
+
+Example: Player “Alice” joins the game and draws while “Bob” guesses
+
+Alice starts the client and enters her username:
+LoginController.connectToServer() creates a GameClient instance.
+GameClient.connect() opens a socket to the server (localhost:5000) and starts the listener thread (startListening()).
+Server accepts Alice’s connection:
+GameServer.start() calls serverSocket.accept() → returns a Socket.
+A new PlayerHandler instance is created for Alice: new PlayerHandler(socket, gameState, this).
+new Thread(handler).start() → runs handler.run() in a separate thread.
+Alice sends her username to the server:
+GameClient.send(username) writes to the server socket.
+On the server, PlayerHandler.run() reads it: in.readLine().
+A Player object is created for Alice, added to GameState.players.
+The server broadcasts "Alice has joined the game!" using server.broadcast().
+Game starts a round:
+If no round exists, GameState.startNextRound() is called.
+A random word is chosen and a Round object is created.
+PlayerHandler.broadcastRoundStart() sends round info to all players:
+Drawer sees the word (e.g., Alice is the drawer and sees "apple").
+Guessers see only the drawer’s name.
+Alice draws on the canvas:
+GameController mouse events capture positions (lastX, lastY).
+Each stroke sends "STROKE:x1,y1,x2,y2" via GameClient.send().
+Server PlayerHandler.handleStroke() receives it, updates Round.drawingData, and broadcasts to all other players except Alice.
+Bob’s GameClient listener receives "STROKE:x1,y1,x2,y2", triggers the callback in GameController, and draws the line on his canvas.
+Bob guesses the word:
+Bob types in guessField → GameController sends "GUESS:apple".
+Server PlayerHandler.run() receives it, calls handleGuess().
+GameState.checkGuess() compares the guess with the word.
+If correct:
+Alice (drawer) gets 50 points, Bob (guesser) gets 100 points.
+Server broadcasts score updates (SCORE_UPDATE) and possibly starts a new round.
+Game continues:
+The above steps repeat for each round.
+At the end of 5 rounds, server broadcasts "GAME_OVER" and leaderboard.
+GameController.showLeaderboard() displays it, offering to play again or e

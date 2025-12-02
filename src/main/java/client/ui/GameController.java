@@ -66,7 +66,7 @@ public class GameController {
                 gc.fillOval(lastX - 2.5, lastY - 2.5, 5, 5);
             }
         });
-
+        // drag
         drawingCanvas.setOnMouseDragged(event -> {
             if (isDrawer && client != null) {
                 double x = event.getX();
@@ -83,7 +83,7 @@ public class GameController {
                 lastY = y;
             }
         });
-
+        // reset
         drawingCanvas.setOnMouseReleased(event -> {
             if (isDrawer) {
                 lastX = -1;
@@ -109,14 +109,14 @@ public class GameController {
     public void setClient(GameClient client) {
         this.client = client;
         client.setMessageCallback(this::handleServerMessage);
-        System.out.println("✅ Client set in GameController | Username: " + client.getUsername());
+        System.out.println(" Client set in GameController | Username: " + client.getUsername());
     }
 
     private void handleServerMessage(String message) {
         Platform.runLater(() -> {
-            System.out.println("📨 Received: " + message);
+            System.out.println(" Received: " + message);
 
-            // Handle STROKE
+            // Handle STROKE to draw
             if (message.startsWith("STROKE:")) {
                 try {
                     String[] parts = message.substring(7).split(",");
@@ -126,7 +126,7 @@ public class GameController {
                     double y2 = Double.parseDouble(parts[3]);
                     gc.strokeLine(x1, y1, x2, y2);
                 } catch (Exception e) {
-                    System.err.println("❌ Error parsing stroke: " + message);
+                    System.err.println(" Error parsing stroke: " + message);
                 }
                 return;
             }
@@ -212,7 +212,7 @@ public class GameController {
     private void showLeaderboard(String data) {
         // Parse leaderboard data
         String[] entries = data.split(",");
-        StringBuilder leaderboard = new StringBuilder("🏆 GAME OVER - LEADERBOARD 🏆\n\n");
+        StringBuilder leaderboard = new StringBuilder(" GAME OVER - LEADERBOARD 🏆\n\n");
         
         for (int i = 0; i < entries.length; i++) {
             String[] parts = entries[i].split(":");
