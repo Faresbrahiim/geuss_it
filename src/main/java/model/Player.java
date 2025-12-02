@@ -1,27 +1,27 @@
 package model;
 
-// player model .....
+// player model ..... describe the player 
 public class Player {
-    // player has username  and score
+    // player has username  and score 
     private String username;
     private int score;
 
     // Constructor
     public Player(String username) {
         this.username = username;
-        this.score = 0; // initial score
+        this.score = 0; // initial score with zero
     }
 
-    // Getters
+    // Get username
     public String getUsername() {
         return username;
     }
-
+    // get score
     public int getScore() {
         return score;
     }
 
-    // Add points
+    // Add points to score 
     public void addScore(int points) {
         this.score += points;
     }

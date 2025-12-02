@@ -9,11 +9,16 @@ import java.util.function.Consumer;
 
 public class GameClient {
 
+    // localhost 
     private final String host;
+    // 5000
     private final int port;
     private Socket socket;
+    // to read
     private BufferedReader in;
+    // to write
     private PrintWriter out;
+    // multiple task at once
     private Thread listenThread;
     private Consumer<String> messageCallback;
 
@@ -24,7 +29,7 @@ public class GameClient {
         this.port = port;
         this.messageCallback = callback;
     }
-
+    // connect 
     public boolean connect() {
         try {
             socket = new Socket(host, port);

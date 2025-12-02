@@ -1,5 +1,17 @@
-(1) Send me your backend code → I check structure
-(2) Add JavaFX project structure (pom.xml + Application class)
-(3) Create FXML screens (login → lobby → game)
-(4) Connect GameClient to UI
-(5) Add drawing canvas + network sync
+palyer.java class 
+    -> describe the player (user score + methods)
+round.java class
+    -> describe the round it should have (drawer  + round number + word to guess + storke + needed methods) 
+    -> round will implemet the drawer the round number etc.....
+gameState.java class
+    -> the main logic of the game -> have (players + round instance + round + words to geuss....)
+gameServer.java class
+    -> start server or open new socket and allows clients to connect needs port number
+    -> it use threads to handle multiple player for example if two clients geuss word at same time + connect at same time
+    -> thread ? A thread is like a separate worker inside your program.
+    -> for each player we create its thread
+    -> future improvment + use mutex to avoid race condition
+playerHandler.java class
+    -> handler the  online player 
+    -> it brodcast the round informations to player + score + check geuss + brodcast the storke
+ 

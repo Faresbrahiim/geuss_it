@@ -1,7 +1,6 @@
 package app;
 
-import client.network.GameClient;
-import client.ui.GameController;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

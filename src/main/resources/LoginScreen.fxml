@@ -22,7 +22,7 @@
                      -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.3),20,0,0,5);"
               prefWidth="450" prefHeight="400">
 
-            <Label text="🎨 GUESS IT!"
+            <Label text="🎨  GUESS IT!"
                    style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #333;" />
 
             <Label text="Enter your username"

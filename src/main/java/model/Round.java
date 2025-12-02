@@ -3,9 +3,9 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-///  round class
+// describe how the rounds should be ....
 public class Round {
-    // rounds like  round 1  , round 2  , round 3
+    // rounds like  round 1  , round 2  , round 3 .....
     private int roundNumber;
     // player which it the one who will draw
     private Player drawer;       // current drawer
@@ -14,7 +14,8 @@ public class Round {
     // store coordinations like  and color ect..
     private List<String> drawingData; // placeholder for strokes
 
-    // constructor .... , will have round number  , and  the drawer + word to geuss
+    // constructor 
+    // the round number + who will draw + the word to guess ()
     public Round(int roundNumber, Player drawer, String wordToGuess) {
         this.roundNumber = roundNumber;
         this.drawer = drawer;
@@ -23,24 +24,24 @@ public class Round {
         this.drawingData = new ArrayList<>();
     }
 
-    // Getters
+    // Get the round number
     public int getRoundNumber() {
         return roundNumber;
     }
-
+    // get the drawer
     public Player getDrawer() {
         return drawer;
     }
-
+    // get the word to geuss
     public String getWordToGuess() {
         return wordToGuess;
     }
-
+    // get the drawing data 
     public List<String> getDrawingData() {
         return drawingData;
     }
-
-    // Add a drawing stroke (simplified as a string for now)
+    
+    // Add a drawing stroke 
     public void addDrawingStroke(String stroke) {
         drawingData.add(stroke);
     }
