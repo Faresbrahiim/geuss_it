@@ -86,7 +86,4 @@ public class LoginController {
         }
     }
 
-    public GameClient getClient() {
-        return client;
-    }
 }

@@ -44,12 +44,7 @@ public class GameState {
     public void removePlayer(Player player) {
         players.remove(player);
     }
-    // get all player from list
-    public List<Player> getPlayers() {
-        return players;
-    }
 
-    //
     public List<Player> getPlayersSortedByScore() {
         return players.stream()
                 .sorted(Comparator.comparingInt(Player::getScore).reversed())
@@ -92,23 +87,5 @@ public class GameState {
         return currentRound.getWordToGuess().equalsIgnoreCase(guess.trim());
     }
 
-    //  These methods inform the listener when something happens
-    // someONE guessed 
-    public void notifyGuessResult(Player player, boolean correct) {
-        if (listener != null) {
-            listener.onGuessResult(player, correct);
-        }
-    }
-    // notify new round started
-    public void notifyRoundStarted(Round round) {
-        if (listener != null) {
-            listener.onRoundStarted(round);
-        }
-    }
-    // notify drawind updated
-    public void notifyDrawingUpdated(Round round) {
-        if (listener != null) {
-            listener.onDrawingUpdated(round);
-        }
-    }
+
 }

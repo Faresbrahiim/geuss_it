@@ -45,21 +45,12 @@ public class GameServer {
             e.printStackTrace();
         }
     }
-    // brodcast the msg to clients
     public void broadcast(String message) {
         for (PlayerHandler client : clients) {
             client.sendMessage(message);
         }
     }
-    // brodcast the msg exept the current client 
-    public void broadcast(String message, PlayerHandler excludeClient) {
-        for (PlayerHandler client : clients) {
-            if (client != excludeClient) {
-                client.sendMessage(message);
-            }
-        }
-    }
-    // send the score to plater
+
     public void sendScoreUpdate(Player player) {
         for (PlayerHandler client : clients) {
             if (client.getPlayer().equals(player)) {
@@ -68,7 +59,6 @@ public class GameServer {
             }
         }
     }
-    // get clients
     public List<PlayerHandler> getClients() {
         return clients;
     }
@@ -76,9 +66,5 @@ public class GameServer {
     public void removeClient(PlayerHandler client) {
         clients.remove(client);
     }
-    
-    // public static void main(String[] args) {
-    //     GameServer server = new GameServer(5000);
-    //     server.start();
-    // }
+
 }

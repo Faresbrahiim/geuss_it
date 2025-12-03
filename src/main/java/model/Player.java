@@ -26,10 +26,6 @@ public class Player {
         this.score += points;
     }
 
-    // Optional: Reset score
-    public void resetScore() {
-        this.score = 0;
-    }
 
     // we add make -> override  to  change the implementation of toString  function just to print it with our format
     @Override

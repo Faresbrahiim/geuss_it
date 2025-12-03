@@ -46,11 +46,6 @@ public class Round {
         drawingData.add(stroke);
     }
 
-    // Clear drawing (for new round or reset)
-    public void clearDrawing() {
-        drawingData.clear();
-    }
-
     @Override
     public String toString() {
         return "Round " + roundNumber + " | Drawer: " + drawer.getUsername() + " | Word: " + wordToGuess;
